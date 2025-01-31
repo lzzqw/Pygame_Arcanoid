@@ -27,7 +27,7 @@ class Block(pygame.sprite.Sprite):
         self.rect.x = koord[0]
         self.rect.y = koord[1]
 
-        self.hit = level
+        self.hit = 1 + level // 2
         self.koord = koord
 
     def get_center(self):
@@ -269,7 +269,6 @@ class Bonus_platf(Bonus):
 
 
 class Bonus_bal(Bonus):
-    image = load_image("bonus_2.png")
 
     def __init__(self, group, center):
         super().__init__(group, 'bonus_ball/bonus_ball_', center)
@@ -281,7 +280,6 @@ class Bonus_bal(Bonus):
 
 
 class Bonus_score(Bonus):
-    image = load_image("bonus_3.png")
 
     def __init__(self, group, center):
         super().__init__(group, 'bonus_score/bonus_score_', center)
@@ -294,8 +292,8 @@ class Bonus_score(Bonus):
 
 
 def reset_level(level):
-    num_hor = 13
-    num_vert = 20
+    num_hor = 7 + level // 3
+    num_vert = 5 +  level // 3
     w = width // num_hor
     h = (hidth // 2) // num_vert
 
@@ -361,16 +359,26 @@ def check_colision():
         all_sprites.remove(i)
         bonuses.remove(i)
 
+def get_level():
+    csv_file = open('data/info.txt', 'r', encoding='utf-8')
+    a = [int(i) for i in csv_file.readline().split(';')]
+    csv_file.close()
+    return a
+
+
+def save_level(level):
+    csv_file = open('data/info.txt', 'w', encoding='utf-8')
+    csv_file.write(str(level))
+
+
 
 pygame.init()
 FPS = 40
 game = False
-level = 1
+level = get_level()[0]
+print(level)
 com = ''
 img_dir = path.join(path.dirname('/ываваава/data'), 'data')
-img_ball = load_image('ball.png')
-img_platform = load_image('platform.png')
-img_block = load_image('block.png')
 img_walper_1 = load_image('walper_1.png')
 
 width = 800
@@ -417,6 +425,7 @@ while True:
         screen.blit(text_1, (200, 50))
         for i in pygame.event.get():
             if i.type == pygame.QUIT:
+                save_level(level)
                 sys.exit()
             elif i.type == pygame.KEYDOWN:
                 if i.key == pygame.K_SPACE:  # Перенести в начало. Реализовать отчистку групп при проигрыше. Синхронизация сложности с уровнем
@@ -447,6 +456,7 @@ while True:
         pressed_keys = pygame.key.get_pressed()
         for i in pygame.event.get():
             if i.type == pygame.QUIT:
+                save_level(level)
                 sys.exit()
 
         '''for i in blocks:
